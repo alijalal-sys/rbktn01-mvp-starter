@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/test');
+mongoose.connect('mongodb://localhost/test', { useMongoClient: true });
+var data = require('../react-client/src/components/data.js')
 
 var db = mongoose.connection;
 
@@ -11,21 +12,40 @@ db.once('open', function() {
   console.log('mongoose connected successfully');
 });
 
-var itemSchema = mongoose.Schema({
-  quantity: Number,
-  description: String
+var userSchema = mongoose.Schema({
+  username: { type: String, required: true, index: { unique: true } },
+  password: { type: String, required: true }
 });
 
-var Item = mongoose.model('Item', itemSchema);
+var peopleSchema = mongoose.Schema({
+  Name: String,
+  Country: String,
+  Email: String,
+  Date: String
+})
+
+var blogShema = mongoose.Schema({
+  text: String
+})
+
+
+var Blog =  mongoose.model('Blog', blogShema);
+var People = mongoose.model('People', peopleSchema);
+var User = mongoose.model('User', userSchema);
+
+People.create(data);
 
 var selectAll = function(callback) {
-  Item.find({}, function(err, items) {
+  User.find({}, function(err, user) {
     if(err) {
       callback(err, null);
     } else {
-      callback(null, items);
+      callback(null, user);
     }
   });
 };
 
 module.exports.selectAll = selectAll;
+module.exports.User = User;
+module.exports.People = People;
+module.exports.Blog = Blog;
